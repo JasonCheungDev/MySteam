@@ -9,12 +9,18 @@ namespace TDDMySteam
         const string API_KEY = "758AEEE709F200A44D5A076B68F7636F";
         const string TEST_ACC_URL = "todo get url";
 
+        // Warning: bad code!
         [Fact]
-        public void GetPublicResultFromApi()
+        public async System.Threading.Tasks.Task IncorrectlyPassingTestAsync()
         {
-            ApiHelper api = new ApiHelper();
-            
-            String result = ApiHelper.Instance.GetMethods();
+            await ApiHelper.Instance.SimpleAsync();
+        }
+
+        /*
+        [Fact]
+        public async void GetPublicResultFromApi()
+        {
+            ApiHelper api = ApiHelper.Instance;
             Assert.NotNull(result);
             // ApiHelper 
             // DataAnalyzer 
@@ -23,7 +29,7 @@ namespace TDDMySteam
         [Fact]
         public void GetKeyResultFromApi()
         {
-            ApiHelper api = new ApiHelper();
+            ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
             String result = api.GetKeyMethods();
             Assert.NotNull(result);
@@ -32,7 +38,7 @@ namespace TDDMySteam
         [Fact]
         public void GetPublicUser()
         {
-            ApiHelper api = new ApiHelper();
+            ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
             SteamModel player = api.GetUserProfile(TEST_ACC_URL);
             Assert.Equals(player.Username, "Jason");
@@ -41,7 +47,7 @@ namespace TDDMySteam
         [Fact]
         public void AttemptKeyCallWithoutKey()
         {
-            ApiHelper api = new ApiHelper();
+            ApiHelper api = ApiHelper.Instance;
             
             try
             {
@@ -58,7 +64,7 @@ namespace TDDMySteam
         {
             const string private_url = "todo get private acc";
 
-            ApiHelper api = new ApiHelper();
+            ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
             SteamModel player = api.GetUserProfile(private_url);
 
@@ -69,7 +75,7 @@ namespace TDDMySteam
         [Fact]
         public void GetTotalGames_ShouldEqual50()
         {
-            ApiHelper api = new ApiHelper();
+            ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
             var data = api.GetGames(TEST_ACC_URL);
 
@@ -79,7 +85,7 @@ namespace TDDMySteam
         [Fact]
         public void CalculateTotalPlayTime_ShouldEqual100()
         {
-            ApiHelper api = new ApiHelper();
+            ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
             var data = api.GetGames(TEST_ACC_URL);
 
@@ -88,6 +94,6 @@ namespace TDDMySteam
 
             Assert.Equals(totalTime, 100);
         }
-
+        */
     }
 }
