@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 
 namespace MySteam.Tests
 {
-    [TestClass]
-    public class ApiHelperTests
+    public class DebugTests
     {
         [TestMethod]
         public async Task TestShouldFail()

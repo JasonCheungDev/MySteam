@@ -1,4 +1,6 @@
 ﻿using MySteam.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +40,6 @@ namespace MySteam.Data
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             Console.WriteLine("ApiHelper done");
-
         }
 
         public string Details()
@@ -60,7 +61,6 @@ namespace MySteam.Data
 
         public async Task<string> GetPublicMethods()
         {
-            throw new Exception();
             string result = null;
             HttpResponseMessage response = await client.GetAsync("ISteamWebAPIUtil/GetSupportedAPIList/v0001/");
             if (response.IsSuccessStatusCode)
@@ -72,19 +72,32 @@ namespace MySteam.Data
 
         public async Task<string> GetPrivateMethods()
         {
-            return await GetPublicMethods();
+            string result = null;
+            HttpResponseMessage response = await client.GetAsync("ISteamWebAPIUtil/GetSupportedAPIList/v0001/" + "?key=" + apiKey);
+            if (response.IsSuccessStatusCode)
+            {
+                result = await response.Content.ReadAsStringAsync();
+            }
+            return result;
         }
 
-        public async Task<SteamModel> GetUser(string url)
+        public async Task<PlayerModel> GetUser(string id)
         {
             if (String.IsNullOrWhiteSpace(apiKey))
                 throw new MissingApiKeyException();
 
-            SteamModel user = null;
-            HttpResponseMessage response = await client.GetAsync(url);
+            PlayerModel user = null;
+            HttpResponseMessage response = await client.GetAsync("ISteamUser/GetPlayerSummaries/v0002/?key=" + apiKey + "&steamids=" + id);
             if (response.IsSuccessStatusCode)
             {
-                user = await response.Content.ReadAsAsync<SteamModel>();
+                var result = await response.Content.ReadAsAsync<PlayerModelResponse>();
+                user = result.response.players.First();
+                // var jsonString = await response.Content.ReadAsStringAsync();
+                // Json.Decode(jsonString);
+                // var jj = JObject.Parse(jsonString);
+                // var models = JsonConvert.DeserializeObject<List<SteamModel>>(jsonString);
+                // user = models[0];
+                // user = await response.Content.ReadAsAsync<SteamModel>();
             }
 
             return user;
@@ -112,7 +125,7 @@ namespace MySteam.Data
     {
         public MissingApiKeyException() : base("Missing API key - Did you forget to call SetKey(key)?") { }
     }
-    
+
 }
 
 /* Notes: 
