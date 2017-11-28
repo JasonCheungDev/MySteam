@@ -68,6 +68,36 @@ namespace MySteam.Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(MissingSteamIDException))]
+        public async Task TryGetUserWithNoId_ShouldThrowMissingIdException()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+            var player = await api.GetUser("");
+            Assert.IsNull(player);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidSteamIDException))]
+        public async Task TryGetUserWithInvalidLength_ShouldThrowInvalidSteamIdException()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+            var player = await api.GetUser("This is totally a legit Steam ID!");
+            Assert.IsNull(player);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidSteamIDException))]
+        public async Task TryGetUserWithInvalidFormat_ShouldThrowInvalidSteamIdException()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+            var player = await api.GetUser("123456789012345!@");
+            Assert.IsNull(player);
+        }
+
+        [TestMethod]
         public async Task GetTestUser_NameIsXaieon()
         {
             ApiHelper api = ApiHelper.Instance;
@@ -129,5 +159,8 @@ namespace MySteam.Tests
             Assert.Equals(totalTime, 100);
         }
         */
+
+
+
     }
 }

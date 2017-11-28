@@ -1,0 +1,114 @@
+﻿@model MySteam.Models.PlayerModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>PlayerModel</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.communityvisibilitystate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.communityvisibilitystate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.profilestate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.profilestate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.personaname)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.personaname)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.lastlogoff)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.lastlogoff)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.profileurl)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.profileurl)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.avatar)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.avatar)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.avatarmedium)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.avatarmedium)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.avatarfull)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.avatarfull)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.personastate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.personastate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.realname)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.realname)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.primaryclanid)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.primaryclanid)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.timecreated)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.timecreated)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.personastateflags)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.personastateflags)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.loccountrycode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.loccountrycode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.locstatecode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.locstatecode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.loccityid)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.loccityid)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.steamid">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

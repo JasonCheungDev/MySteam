@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MySteam.Data
@@ -28,6 +29,8 @@ namespace MySteam.Data
         private static HttpClient client = new HttpClient();
 
         private static string apiKey;
+
+        private static Regex alphanumericRegex = new Regex("^[a-zA-Z0-9]*$");
 
 
         private ApiHelper()
@@ -86,6 +89,12 @@ namespace MySteam.Data
             if (String.IsNullOrWhiteSpace(apiKey))
                 throw new MissingApiKeyException();
 
+            if (String.IsNullOrWhiteSpace(id))
+                throw new MissingSteamIDException();
+
+            if (!IsDigitsOnly(id) || id.Length != 17)
+                throw new InvalidSteamIDException(id);
+
             PlayerModel user = null;
             HttpResponseMessage response = await client.GetAsync("ISteamUser/GetPlayerSummaries/v0002/?key=" + apiKey + "&steamids=" + id);
             if (response.IsSuccessStatusCode)
@@ -118,7 +127,13 @@ namespace MySteam.Data
             apiKey = key;
         }
 
-
+        bool IsDigitsOnly(string str)
+        {
+            foreach (char c in str)
+                if (c < '0' || c > '9')
+                    return false;
+            return true;
+        }
     }
 
     public class MissingApiKeyException : Exception
@@ -126,6 +141,15 @@ namespace MySteam.Data
         public MissingApiKeyException() : base("Missing API key - Did you forget to call SetKey(key)?") { }
     }
 
+    public class MissingSteamIDException : Exception
+    {
+        public MissingSteamIDException() : base("Missing Steam ID") { }
+    }
+
+    public class InvalidSteamIDException : Exception
+    {
+        public InvalidSteamIDException(string id) : base("Invalid Steam ID - " + id + ". Must be 32 alphanumeric characters.") { }
+    }
 }
 
 /* Notes: 

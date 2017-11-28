@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using MySteam.Models;
 
 namespace MySteam
 {
@@ -22,6 +24,9 @@ namespace MySteam
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddDbContext<MySteamContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("MySteamContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

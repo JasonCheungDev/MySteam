@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +9,8 @@ namespace MySteam.Models
 {
     public class PlayerModel
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string steamid { get; set; }
         public int communityvisibilitystate { get; set; }
         public int profilestate { get; set; }

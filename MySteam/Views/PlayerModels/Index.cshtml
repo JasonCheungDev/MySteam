@@ -1,0 +1,125 @@
+﻿@model IEnumerable<MySteam.Models.PlayerModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.communityvisibilitystate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.profilestate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.personaname)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.lastlogoff)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.profileurl)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.avatar)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.avatarmedium)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.avatarfull)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.personastate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.realname)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.primaryclanid)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.timecreated)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.personastateflags)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.loccountrycode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.locstatecode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.loccityid)
+                </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.communityvisibilitystate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.profilestate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.personaname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.lastlogoff)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.profileurl)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.avatar)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.avatarmedium)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.avatarfull)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.personastate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.realname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.primaryclanid)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.timecreated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.personastateflags)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.loccountrycode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.locstatecode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.loccityid)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.steamid">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.steamid">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.steamid">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
