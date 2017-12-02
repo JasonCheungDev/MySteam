@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MySteam.Data;
+using MySteam.Models;
 
 namespace MySteam.Models
 {
@@ -30,5 +31,7 @@ namespace MySteam.Models
         }
 
         public DbSet<MySteam.Models.PlayerModel> PlayerModel { get; set; }
+
+        public DbSet<MySteam.Models.SimpleGameModel> SimpleGameModel { get; set; }
     }
 }

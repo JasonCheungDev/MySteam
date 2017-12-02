@@ -3,6 +3,7 @@ using MySteam.Data;
 using MySteam.Models;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MySteam.Tests
@@ -33,6 +34,7 @@ namespace MySteam.Tests
         public async Task ApiKeyResultsShouldNotBeNull()
         {
             var api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
             var result = await ApiHelper.Instance.GetPrivateMethods();
             Trace.WriteLine(result);
             Assert.IsNotNull(result);
@@ -106,6 +108,80 @@ namespace MySteam.Tests
             Assert.AreEqual("Xaieon", player.personaname);
         }
 
+        [TestMethod]
+        public async Task GetAllGames_ShouldCountTo50()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+            
+            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+
+            Assert.AreEqual(93, data.Count);
+        }
+
+        [TestMethod]
+        public async Task CalculateTotalPlayTime_ShouldEqual100()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            int totalTime = DataAnalyzer.CalculateTotalTimePlayed(data);
+
+            Assert.AreEqual(93057, totalTime);
+        }
+
+        [TestMethod]
+        public async Task FindMostPlayedGame_ShouldBeNier()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            SimpleGameModel game = DataAnalyzer.FindMostPlayedGame(data);
+
+            Assert.AreEqual("Nier", game.name);
+        }
+
+        [TestMethod]
+        public async Task FindTotalGameWorth()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            var appIds = data.Select(sgm => sgm.appid).ToList();
+            var moreData = await api.GetDetailedGameInfos(appIds);
+            
+            float worth = DataAnalyzer.CalculateTotalGameWorth(data);
+
+            Assert.AreEqual(1000, worth);
+        }
+
+        [TestMethod]
+        public async Task FindMostExpensiveGame_ShouldBeNier()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            SimpleGameModel game = DataAnalyzer.FindMostPlayedGame(data);
+
+            Assert.AreEqual("Nier", game.name);
+        }
+
+        [TestMethod]
+        public async Task FindLeastExpensiveGame_ShouldBeFuri()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            SimpleGameModel game = DataAnalyzer.FindMostPlayedGame(data);
+
+            Assert.AreEqual("Nier", game.name);
+        }
+
 
         /*
         [Fact]
@@ -159,7 +235,6 @@ namespace MySteam.Tests
             Assert.Equals(totalTime, 100);
         }
         */
-
 
 
     }

@@ -30,14 +30,14 @@ namespace MySteam.Models
         public int loccityid { get; set; }
     }
 
-    public class Response
+    public class PlayerResponse
     {
         public List<PlayerModel> players { get; set; }
     }
 
-    public class PlayerModelResponse
+    public class PlayerRequestResult
     {
-        public Response response { get; set; }
+        public PlayerResponse response { get; set; }
     }
 
 }

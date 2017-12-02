@@ -60,9 +60,37 @@ namespace MySteam.Controllers
         }
 
         // GET: PlayerModels/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Games(string id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            List<SimpleGameModel> games;
+
+            try
+            {
+                ApiHelper.Instance.SetKey(Constants.API_KEY);
+                games = await ApiHelper.Instance.GetGamesForUser(id, true);
+                // await _context.PlayerModel.SingleOrDefaultAsync(m => m.steamid == id);
+            }
+            catch (MissingSteamIDException ex)
+            {
+                return NotFound();
+                // return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
+            catch (InvalidSteamIDException ex)
+            {
+                return NotFound();
+            }
+
+            if (games == null)
+            {
+                return NotFound();
+            }
+
+            return View(games);
         }
 
         // POST: PlayerModels/Create

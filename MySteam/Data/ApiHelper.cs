@@ -25,6 +25,7 @@ namespace MySteam.Data
             }
         }
 
+        // need another client 
 
         private static HttpClient client = new HttpClient();
 
@@ -75,8 +76,10 @@ namespace MySteam.Data
 
         public async Task<string> GetPrivateMethods()
         {
+            // http://api.steampowered.com/ISteamWebAPIUtil/GetSupportedAPIList/v0001/?key=758AEEE709F200A44D5A076B68F7636F"
             string result = null;
             HttpResponseMessage response = await client.GetAsync("ISteamWebAPIUtil/GetSupportedAPIList/v0001/" + "?key=" + apiKey);
+            Console.WriteLine("GetPrivateMethods " + apiKey);
             if (response.IsSuccessStatusCode)
             {
                 result = await response.Content.ReadAsStringAsync();
@@ -99,7 +102,7 @@ namespace MySteam.Data
             HttpResponseMessage response = await client.GetAsync("ISteamUser/GetPlayerSummaries/v0002/?key=" + apiKey + "&steamids=" + id);
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadAsAsync<PlayerModelResponse>();
+                var result = await response.Content.ReadAsAsync<PlayerRequestResult>();
                 user = result.response.players.First();
                 // var jsonString = await response.Content.ReadAsStringAsync();
                 // Json.Decode(jsonString);
@@ -111,6 +114,43 @@ namespace MySteam.Data
 
             return user;
         }
+
+        public async Task<List<SimpleGameModel>> GetGamesForUser(string id, bool details = false)
+        {
+            if (String.IsNullOrWhiteSpace(apiKey))
+                throw new MissingApiKeyException();
+
+            if (String.IsNullOrWhiteSpace(id))
+                throw new MissingSteamIDException();
+
+            if (!IsDigitsOnly(id) || id.Length != 17)
+                throw new InvalidSteamIDException(id);
+
+            List<SimpleGameModel> games = null;
+            HttpResponseMessage response = await client.GetAsync("IPlayerService/GetOwnedGames/v0001/?key=" + apiKey + "&steamid=" + id + (details ? "&include_appinfo=1" : ""));
+            // http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=758AEEE709F200A44D5A076B68F7636F&steamid=76561198020784166&include_appinfo=1
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsAsync<SimpleGameResult>();
+                games = result.response.games;
+                // var jsonString = await response.Content.ReadAsStringAsync();
+                // Json.Decode(jsonString);
+                // var jj = JObject.Parse(jsonString);
+                // var models = JsonConvert.DeserializeObject<List<SteamModel>>(jsonString);
+                // user = models[0];
+                // user = await response.Content.ReadAsAsync<SteamModel>();
+            }
+
+            return games;
+        }
+
+        public Task GetDetailedGameInfos(List<int> appIds)
+        {
+            throw new NotImplementedException();
+        }
+
+
 
         //static async Task RunAsync()
         //{
