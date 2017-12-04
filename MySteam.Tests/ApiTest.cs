@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MySteam.Data;
 using MySteam.Models;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,11 +15,20 @@ namespace MySteam.Tests
     {
         const string API_KEY = "758AEEE709F200A44D5A076B68F7636F";
         const string TEST_ACC_URL = "76561198020784166";
+        const string TEST_OLD_ACC_URL = "76561198051910246";
         // http://steamcommunity.com/profiles/76561198020784166/
 
         public ApiTest()
         {
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+            InitContext();
+        }
+
+        public void InitContext()
+        {
+            var builder = new DbContextOptionsBuilder<MySteamContext>()
+                .UseInMemoryDatabase("TestContext");
+            var context = new MySteamContext(builder.Options);
         }
 
         [TestMethod]
@@ -144,16 +155,30 @@ namespace MySteam.Tests
         }
 
         [TestMethod]
+        public async Task TestIfDuplicateRequest_UsesDatabase()
+        {
+            ApiHelper api = ApiHelper.Instance;
+
+            var id = new List<int>();
+            id.Add(400);
+
+            var data1 = await api.GetDetailedGameInfos(id);
+            var data2 = await api.GetDetailedGameInfos(id);
+
+            // Console should print first from API, second from DB
+        }
+
+        [TestMethod]
         public async Task FindTotalGameWorth()
         {
             ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
 
-            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            var data = await api.GetGamesForUser(TEST_OLD_ACC_URL, true);
             var appIds = data.Select(sgm => sgm.appid).ToList();
-            var moreData = await api.GetDetailedGameInfos(appIds);
+            var detailedData = await api.GetDetailedGameInfos(appIds);
             
-            float worth = DataAnalyzer.CalculateTotalGameWorth(data);
+            float worth = DataAnalyzer.CalculateTotalGameWorth(detailedData);
 
             Assert.AreEqual(1000, worth);
         }

@@ -19,9 +19,31 @@ namespace MySteam.Data
             return timePlayed;
         }
 
-        public static float CalculateTotalGameWorth(List<SimpleGameModel> data)
+        public static SimpleGameModel FindMostPlayedGame(List<SimpleGameModel> games)
         {
-            throw new NotImplementedException();
+            SimpleGameModel mostPlayed = null;
+            int currentMostPlayedTime = 0;
+            foreach (SimpleGameModel sgm in games)
+            {
+                if (sgm.playtime_forever > currentMostPlayedTime)
+                {
+                    mostPlayed = sgm;
+                }
+            }
+            return mostPlayed;
+        }
+
+        public static float CalculateTotalGameWorth(List<DetailedGameData> data)
+        {
+            int totalWorth = 0;
+            foreach (DetailedGameData dgd in data)
+            {
+                if (dgd.price_overview != null) // non-free game 
+                {
+                    totalWorth += dgd.price_overview.final;
+                }
+            }
+            return totalWorth * 0.01f;
         }
     }
 }

@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,12 +10,13 @@ namespace MySteam.Models
 {
     public class PcRequirements
     {
-        public string minimum { get; set; }
+        public string minimum { get; set; }             // if PC supported return string
+        // public List<string> minimum { get; set; }    // if PC not supported returns empty array
     }
 
     public class MacRequirements
     {
-        public string minimum { get; set; }
+        public string minimum { get; set; }             // warning: see PcRequirements
     }
 
     public class Demo
@@ -114,7 +118,7 @@ namespace MySteam.Models
         public string email { get; set; }
     }
 
-    public class Data
+    public class DetailedGameData
     {
         public string type { get; set; }
         public string name { get; set; }
@@ -128,9 +132,11 @@ namespace MySteam.Models
         public string supported_languages { get; set; }
         public string header_image { get; set; }
         public string website { get; set; }
-        public PcRequirements pc_requirements { get; set; }
-        public MacRequirements mac_requirements { get; set; }
-        public List<object> linux_requirements { get; set; }
+        //[JsonProperty(Required = Required.AllowNull, NullValueHandling =NullValueHandling.Ignore)]
+        //public PcRequirements pc_requirements { get; set; }       // either returns a string or an empty array (Object can't be of type string or List<string> at the same time
+        //[JsonProperty(Required = Required.AllowNull, NullValueHandling = NullValueHandling.Ignore)]
+        //public MacRequirements mac_requirements { get; set; }
+        //public List<object> linux_requirements { get; set; }
         public List<string> developers { get; set; }
         public List<string> publishers { get; set; }
         public List<Demo> demos { get; set; }
@@ -149,14 +155,51 @@ namespace MySteam.Models
         public string background { get; set; }
     }
 
-    public class __invalid_type__400
+    public class DetailedGameModelResponse
     {
         public bool success { get; set; }
-        public Data data { get; set; }
+        public DetailedGameData data { get; set; }
     }
 
-    public class RootObject
+    // THIS MODEL DOESN'T WORK
+    [System.Obsolete("This model does not work, please use Dictionary<int, DetailedGameModelResponse> instead.")]
+    public class DetailedGameModelResult
     {
-        public __invalid_type__400 __invalid_name__400 { get; set; }
+        public Dictionary<int, DetailedGameModelResponse> response { get; set; }
+        // if the root object contained an array with key "response" and value "unknown key":"DGMR then this would work.
+        // but the root object contains the unknown key right away. 
+    }
+
+    // EF MODEL
+
+    public class DetailedGameModelDatabase
+    {
+        [Key]
+        public int appid;                           // appid of the game (ie. 578080 for PUBG)
+        public string DetailedGameModelDataString;  // json string of the DetailedGameModelData. Actual object not stored due to many different objects.
+
+        [NotMapped]
+        private DetailedGameData mData;
+        [NotMapped]
+        public DetailedGameData data
+        {
+            get
+            {
+                if (mData == null)
+                {
+                    mData = JsonConvert.DeserializeObject<DetailedGameData>(DetailedGameModelDataString);
+                }
+                return mData;
+            }
+        }
     }
 }
+
+/* JSON Format
+{
+    578080 (appid): {
+        success: true (or false if appid does not exist),
+        data: {...}
+    }
+}
+*/

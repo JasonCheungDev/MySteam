@@ -33,5 +33,7 @@ namespace MySteam.Models
         public DbSet<MySteam.Models.PlayerModel> PlayerModel { get; set; }
 
         public DbSet<MySteam.Models.SimpleGameModel> SimpleGameModel { get; set; }
+
+        public DbSet<MySteam.Models.DetailedGameModelDatabase> DetailedGame { get; set; }
     }
 }

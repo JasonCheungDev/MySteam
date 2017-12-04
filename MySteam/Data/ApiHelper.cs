@@ -29,9 +29,13 @@ namespace MySteam.Data
 
         private static HttpClient client = new HttpClient();
 
+        private static HttpClient storeClient = new HttpClient();
+
         private static string apiKey;
 
         private static Regex alphanumericRegex = new Regex("^[a-zA-Z0-9]*$");
+
+        private MySteamContext db; 
 
 
         private ApiHelper()
@@ -43,7 +47,16 @@ namespace MySteam.Data
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+            storeClient.BaseAddress = new Uri("http://store.steampowered.com/api/");
+            storeClient.DefaultRequestHeaders.Accept.Clear();
+            storeClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
             Console.WriteLine("ApiHelper done");
+        }
+
+        public void SetContext(MySteamContext dbContext)
+        {
+            db = dbContext;
         }
 
         public string Details()
@@ -145,9 +158,37 @@ namespace MySteam.Data
             return games;
         }
 
-        public Task GetDetailedGameInfos(List<int> appIds)
+        public async Task<List<DetailedGameData>> GetDetailedGameInfos(List<int> appIds)
         {
-            throw new NotImplementedException();
+            List<DetailedGameData> data = new List<DetailedGameData>();
+
+            foreach (int appid in appIds)
+            {
+                Console.WriteLine("GetDetailedGameInfos for appid: " + appid);
+                // check db first
+
+                // retrieve using API request 
+                HttpResponseMessage response = await storeClient.GetAsync("appdetails?appids=" + appid);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsAsync<Dictionary<int, DetailedGameModelResponse>>();
+
+                    if (result.Values.First().success)
+                    {
+                        data.Add(result.Values.First().data);
+                    }
+                    else
+                    {
+                        Console.WriteLine("GetDetailedGameInfo - pulling data for " + appid + " failed.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("GetDetailedGameInfos response unsuccessful for appid: " + appid);
+                }
+            }
+
+            return data;
         }
 
 
