@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 
 namespace MySteam.Models
 {
-    public class PlayerModel
+    #region User Summary 
+
+    public class UserModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string steamid { get; set; }
-        public int communityvisibilitystate { get; set; }
+        public UserVisibility communityvisibilitystate { get; set; }
         public int profilestate { get; set; }
         public string personaname { get; set; }
         public int lastlogoff { get; set; }
@@ -30,14 +32,36 @@ namespace MySteam.Models
         public int loccityid { get; set; }
     }
 
-    public class PlayerResponse
+    public class UserResponse
     {
-        public List<PlayerModel> players { get; set; }
+        public List<UserModel> players { get; set; }
     }
 
-    public class PlayerRequestResult
+    public class UserRequestResult
     {
-        public PlayerResponse response { get; set; }
+        public UserResponse response { get; set; }
     }
+
+    public enum UserVisibility
+    {
+        Invisible = 1,  // private, friends, only, etc. 
+        Visible = 3     // public
+    }
+
+    #endregion
+
+    #region User Level
+
+    public class UserLevelResponse
+    {
+        public int player_level { get; set; }
+    }
+
+    public class UserLevelResult
+    {
+        public UserLevelResponse response { get; set; }
+    }
+
+    #endregion
 
 }

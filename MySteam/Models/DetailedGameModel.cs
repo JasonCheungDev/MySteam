@@ -170,13 +170,14 @@ namespace MySteam.Models
         // but the root object contains the unknown key right away. 
     }
 
-    // EF MODEL
+    // EF
 
     public class DetailedGameModelDatabase
     {
         [Key]
-        public int appid;                           // appid of the game (ie. 578080 for PUBG)
-        public string DetailedGameModelDataString;  // json string of the DetailedGameModelData. Actual object not stored due to many different objects.
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int appid { get; set; }                        // appid of the game (ie. 578080 for PUBG)
+        public string DetailedGameModelDataString { get; set; }  // json string of the DetailedGameModelData. Actual object not stored due to many different objects.
 
         [NotMapped]
         private DetailedGameData mData;
@@ -193,6 +194,7 @@ namespace MySteam.Models
             }
         }
     }
+
 }
 
 /* JSON Format

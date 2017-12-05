@@ -22,15 +22,31 @@ namespace MySteam.Data
         public static SimpleGameModel FindMostPlayedGame(List<SimpleGameModel> games)
         {
             SimpleGameModel mostPlayed = null;
-            int currentMostPlayedTime = 0;
             foreach (SimpleGameModel sgm in games)
             {
-                if (sgm.playtime_forever > currentMostPlayedTime)
-                {
+                if (sgm.playtime_forever == 0)
+                    continue;
+                if (mostPlayed == null)
                     mostPlayed = sgm;
-                }
+                else if (sgm.playtime_forever > mostPlayed.playtime_forever)
+                    mostPlayed = sgm;
             }
             return mostPlayed;
+        }
+
+        public static SimpleGameModel FindLeastPlayedGame(List<SimpleGameModel> games)
+        {
+            SimpleGameModel leastPlayed = null;
+            foreach (SimpleGameModel sgm in games)
+            {
+                if (sgm.playtime_forever == 0)
+                    continue;
+                if (leastPlayed == null)
+                    leastPlayed = sgm;
+                else if (sgm.playtime_forever < leastPlayed.playtime_forever)
+                    leastPlayed = sgm;
+            }
+            return leastPlayed;
         }
 
         public static DetailedGameData FindMostExpensiveGame(List<DetailedGameData> games)
@@ -39,7 +55,7 @@ namespace MySteam.Data
             int highestCost = 0;
             foreach (DetailedGameData dgd in games)
             {
-                if (dgd.price_overview != null && dgd.price_overview.final > highestCost)
+                if (dgd.price_overview != null && dgd.price_overview.initial > highestCost)
                 {
                     mostExpensive = dgd;
                 }
@@ -53,7 +69,7 @@ namespace MySteam.Data
             int lowestCost = int.MaxValue;
             foreach (DetailedGameData dgd in games)
             {
-                if (dgd.price_overview != null && dgd.price_overview.final < lowestCost)
+                if (dgd.price_overview != null && dgd.price_overview.initial < lowestCost)
                 {
                     leastExpensive = dgd;
                 }
@@ -79,7 +95,7 @@ namespace MySteam.Data
                     continue;   // skip free games 
                 }
 
-                float currentValue = data2[i].price_overview.final / data1[i].playtime_forever;
+                float currentValue = data2[i].price_overview.initial / data1[i].playtime_forever;
 
                 if (currentValue > bestValue.value)
                 {
@@ -115,7 +131,7 @@ namespace MySteam.Data
                     continue;   // skip free games 
                 }
 
-                float currentValue = data2[i].price_overview.final / data1[i].playtime_forever;
+                float currentValue = data2[i].price_overview.initial / data1[i].playtime_forever;
 
                 if (currentValue < bestValue.value)
                 {
@@ -133,24 +149,51 @@ namespace MySteam.Data
             return bestValue;
         }
 
-        public struct GameValue
+        public static double CalculateTotalGameWorth(List<DetailedGameData> data)
         {
-            public SimpleGameModel simpleGame;
-            public DetailedGameData detailedGame;
-            public float value; 
-        }
-
-        public static float CalculateTotalGameWorth(List<DetailedGameData> data)
-        {
-            int totalWorth = 0;
+            int totalWorth = 0; 
             foreach (DetailedGameData dgd in data)
             {
                 if (dgd.price_overview != null) // non-free game 
                 {
-                    totalWorth += dgd.price_overview.final;
+                    totalWorth += dgd.price_overview.initial;
                 }
             }
-            return totalWorth * 0.01f;
+            return Math.Round(totalWorth * 0.01, 2);
+        }
+
+        public static double CalculateAchievementPercentage(List<AchievementUserStats> achievementList)
+        {
+            int completedCount = 0;
+            int incompletedCount = 0;
+
+            foreach (AchievementUserStats aus in achievementList)
+            {
+                foreach (AchievementUser au in aus.achievements)
+                {
+                    if (au.achieved == 1)
+                    {
+                        completedCount++;
+                    }
+                    else
+                    {
+                        incompletedCount++;
+                    }
+                }
+            }
+
+            double percentage = (double)completedCount / (double)(completedCount + incompletedCount);
+            return Math.Round(percentage, 4);
         }
     }
+}
+
+/// <summary>
+/// Simple struct that holds a SimpleGame object, DetailedGame object, and value (cost / time). 
+/// </summary>
+public struct GameValue
+{
+    public SimpleGameModel simpleGame;
+    public DetailedGameData detailedGame;
+    public float value;
 }

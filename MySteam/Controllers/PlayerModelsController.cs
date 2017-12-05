@@ -22,7 +22,7 @@ namespace MySteam.Controllers
         // GET: PlayerModels
         public async Task<IActionResult> Index()
         {
-            return View(new List<PlayerModel>());
+            return View(new List<UserModel>());
             // return View(await _context.PlayerModel.ToListAsync());
         }
 
@@ -34,7 +34,7 @@ namespace MySteam.Controllers
                 return NotFound();
             }
 
-            PlayerModel playerModel;
+            UserModel playerModel;
 
             try
             {
@@ -98,7 +98,7 @@ namespace MySteam.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("steamid,communityvisibilitystate,profilestate,personaname,lastlogoff,profileurl,avatar,avatarmedium,avatarfull,personastate,realname,primaryclanid,timecreated,personastateflags,loccountrycode,locstatecode,loccityid")] PlayerModel playerModel)
+        public async Task<IActionResult> Create([Bind("steamid,communityvisibilitystate,profilestate,personaname,lastlogoff,profileurl,avatar,avatarmedium,avatarfull,personastate,realname,primaryclanid,timecreated,personastateflags,loccountrycode,locstatecode,loccityid")] UserModel playerModel)
         {
             if (ModelState.IsValid)
             {
@@ -130,7 +130,7 @@ namespace MySteam.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("steamid,communityvisibilitystate,profilestate,personaname,lastlogoff,profileurl,avatar,avatarmedium,avatarfull,personastate,realname,primaryclanid,timecreated,personastateflags,loccountrycode,locstatecode,loccityid")] PlayerModel playerModel)
+        public async Task<IActionResult> Edit(string id, [Bind("steamid,communityvisibilitystate,profilestate,personaname,lastlogoff,profileurl,avatar,avatarmedium,avatarfull,personastate,realname,primaryclanid,timecreated,personastateflags,loccountrycode,locstatecode,loccityid")] UserModel playerModel)
         {
             if (id != playerModel.steamid)
             {

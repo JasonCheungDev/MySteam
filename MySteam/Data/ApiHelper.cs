@@ -100,7 +100,7 @@ namespace MySteam.Data
             return result;
         }
 
-        public async Task<PlayerModel> GetUser(string id)
+        public async Task<UserModel> GetUser(string id)
         {
             if (String.IsNullOrWhiteSpace(apiKey))
                 throw new MissingApiKeyException();
@@ -111,11 +111,11 @@ namespace MySteam.Data
             if (!IsDigitsOnly(id) || id.Length != 17)
                 throw new InvalidSteamIDException(id);
 
-            PlayerModel user = null;
+            UserModel user = null;
             HttpResponseMessage response = await client.GetAsync("ISteamUser/GetPlayerSummaries/v0002/?key=" + apiKey + "&steamids=" + id);
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadAsAsync<PlayerRequestResult>();
+                var result = await response.Content.ReadAsAsync<UserRequestResult>();
                 user = result.response.players.First();
                 // var jsonString = await response.Content.ReadAsStringAsync();
                 // Json.Decode(jsonString);
@@ -126,6 +126,29 @@ namespace MySteam.Data
             }
 
             return user;
+        }
+
+        public async Task<int> GetUserLevel(string id)
+        {
+            if (String.IsNullOrWhiteSpace(apiKey))
+                throw new MissingApiKeyException();
+
+            if (String.IsNullOrWhiteSpace(id))
+                throw new MissingSteamIDException();
+
+            if (!IsDigitsOnly(id) || id.Length != 17)
+                throw new InvalidSteamIDException(id);
+
+            HttpResponseMessage response = await client.GetAsync("IPlayerService/GetSteamLevel/v0001/?key=" + apiKey + "&steamid=" + id);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsAsync<UserLevelResult>();
+                return result.response.player_level;
+            }
+            else
+            {
+                return -1;  // TODO; throw exception
+            }
         }
 
         public async Task<List<SimpleGameModel>> GetGamesForUser(string id, bool details = false)
@@ -165,7 +188,6 @@ namespace MySteam.Data
             foreach (int appid in appIds)
             {
                 Console.WriteLine("GetDetailedGameInfos for appid: " + appid);
-                // check db first
 
                 // retrieve using API request 
                 HttpResponseMessage response = await storeClient.GetAsync("appdetails?appids=" + appid);
@@ -189,6 +211,48 @@ namespace MySteam.Data
             }
 
             return data;
+        }
+
+        public async Task<List<AchievementUserStats>> GetSimpleAchievementsForUser(string id, List<int> appids)
+        {
+            if (String.IsNullOrWhiteSpace(apiKey))
+                throw new MissingApiKeyException();
+
+            if (String.IsNullOrWhiteSpace(id))
+                throw new MissingSteamIDException();
+
+            if (!IsDigitsOnly(id) || id.Length != 17)
+                throw new InvalidSteamIDException(id);
+
+            if (appids.Count == 0)
+                throw new ArgumentException("appids is empty!");
+
+            List<AchievementUserStats> achievements = new List<AchievementUserStats>();
+
+            foreach (int appid in appids)
+            {
+                HttpResponseMessage response = await client.GetAsync("ISteamUserStats/GetPlayerAchievements/v0001/?key=" + apiKey + "&steamid=" + id + "&appid=" + appid);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsAsync<AchievementUserResult>();
+                   
+                    if (result.playerstats.success && result.playerstats.achievements != null)  // Some gaves have an achievement model - but no achievements. 
+                    {
+                        achievements.Add(result.playerstats);
+                    }
+                    else
+                    {
+                        Console.WriteLine("GetSimpleAchievementsForUser - pulling data for " + appid + " failed.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("GetSimpleAchievementsForUser response unsuccessful for appid: " + appid);
+                    // Some games don't have achievements - the response will be unsuccessful.
+                }
+            }
+
+            return achievements;
         }
 
 

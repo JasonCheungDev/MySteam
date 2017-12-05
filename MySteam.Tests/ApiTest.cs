@@ -20,16 +20,11 @@ namespace MySteam.Tests
 
         public ApiTest()
         {
+            Console.WriteLine("ApiTest ctor start");
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
-            InitContext();
+            Console.WriteLine("ApiTest ctor end");
         }
 
-        public void InitContext()
-        {
-            var builder = new DbContextOptionsBuilder<MySteamContext>()
-                .UseInMemoryDatabase("TestContext");
-            var context = new MySteamContext(builder.Options);
-        }
 
         [TestMethod]
         public async Task PublicApiResultsShouldNotBeNull()
@@ -73,9 +68,9 @@ namespace MySteam.Tests
         public async Task CallApiWithoutKey_ShouldThrowException()
         {
             ApiHelper api = ApiHelper.Instance;
-            // do not set key
+            api.SetKey(""); // key may be set by another test!
 
-            var player = await api.GetUser(TEST_ACC_URL);
+            var player = await api.GetUser(TEST_OLD_ACC_URL);
 
             // Assert Exception - MissingApiKeyException
         }
@@ -111,12 +106,21 @@ namespace MySteam.Tests
         }
 
         [TestMethod]
-        public async Task GetTestUser_NameIsXaieon()
+        public async Task GetTestUser_ShouldBeSpartoi()
         {
             ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
-            var player = await api.GetUser(TEST_ACC_URL);
-            Assert.AreEqual("Xaieon", player.personaname);
+            var player = await api.GetUser(TEST_OLD_ACC_URL);
+            Assert.AreEqual("Spartoi", player.personaname);
+        }
+
+        [TestMethod]
+        public async Task GetTestUserLevel_ShouldBe5()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+            var level = await api.GetUserLevel(TEST_OLD_ACC_URL);
+            Assert.AreEqual(5, level);
         }
 
         [TestMethod]
@@ -125,9 +129,9 @@ namespace MySteam.Tests
             ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
             
-            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            var data = await api.GetGamesForUser(TEST_OLD_ACC_URL, true);
 
-            Assert.AreEqual(93, data.Count);
+            Assert.AreEqual(18, data.Count);
         }
 
         [TestMethod]
@@ -136,37 +140,58 @@ namespace MySteam.Tests
             ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
 
-            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            var data = await api.GetGamesForUser(TEST_OLD_ACC_URL, true);
             int totalTime = DataAnalyzer.CalculateTotalTimePlayed(data);
 
-            Assert.AreEqual(93057, totalTime);
+            Assert.AreEqual(3789, totalTime);
         }
 
         [TestMethod]
-        public async Task FindMostPlayedGame_ShouldBeNier()
+        public async Task FindMostPlayedGame_ShouldBeDungeonDefenders()
         {
             ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
 
-            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            var data = await api.GetGamesForUser(TEST_OLD_ACC_URL, true);
             SimpleGameModel game = DataAnalyzer.FindMostPlayedGame(data);
 
-            Assert.AreEqual("Nier", game.name);
+            Assert.AreEqual("Dungeon Defenders", game.name);
         }
 
         [TestMethod]
-        public async Task TestIfDuplicateRequest_UsesDatabase()
+        public async Task FindLeastPlayedGame_ShouldBeMapleStory()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var data = await api.GetGamesForUser(TEST_OLD_ACC_URL, true);
+            SimpleGameModel game = DataAnalyzer.FindLeastPlayedGame(data);
+
+            Assert.AreEqual("MapleStory", game.name);       // Note: 2 mins - doesn't show up on profile
+        }
+
+        [TestMethod]
+        public async Task GetDetailedGameData_ShouldBePortal()
         {
             ApiHelper api = ApiHelper.Instance;
 
-            var id = new List<int>();
-            id.Add(400);
+            var detailedData = await api.GetDetailedGameInfos(new List<int>() { 400 });
 
-            var data1 = await api.GetDetailedGameInfos(id);
-            var data2 = await api.GetDetailedGameInfos(id);
-
-            // Console should print first from API, second from DB
+            Assert.AreEqual("Portal", detailedData.First().name);
         }
+
+        [TestMethod]
+        public async Task GetDetailedGameData_ForNonExistingAppId_NoResults()
+        {
+            ApiHelper api = ApiHelper.Instance;
+
+            var detailedData = await api.GetDetailedGameInfos(new List<int>() { 404 });
+
+            Assert.AreEqual(0, detailedData.Count);
+        }
+
+
+#region WARNING: High API call tests
 
         [TestMethod]
         public async Task FindTotalGameWorth()
@@ -178,34 +203,80 @@ namespace MySteam.Tests
             var appIds = data.Select(sgm => sgm.appid).ToList();
             var detailedData = await api.GetDetailedGameInfos(appIds);
             
-            float worth = DataAnalyzer.CalculateTotalGameWorth(detailedData);
+            double worth = DataAnalyzer.CalculateTotalGameWorth(detailedData);
 
-            Assert.AreEqual(1000, worth);
+            Assert.AreEqual(150.98, worth);
         }
 
         [TestMethod]
+        public async Task FindTotalAchievementPercentange_ShouldBe50Percent()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var gameList = await api.GetGamesForUser(TEST_OLD_ACC_URL);
+            var appIds = gameList.Select(g => g.appid).ToList();
+            var achievementList = await api.GetSimpleAchievementsForUser(TEST_OLD_ACC_URL, appIds);
+            double completion = DataAnalyzer.CalculateAchievementPercentage(achievementList);
+
+            Assert.AreEqual(0.0978, completion);
+        }
+
+        //[TestMethod]
         public async Task FindMostExpensiveGame_ShouldBeNier()
         {
             ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
 
-            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            var data = await api.GetGamesForUser(TEST_OLD_ACC_URL, true);
             SimpleGameModel game = DataAnalyzer.FindMostPlayedGame(data);
 
             Assert.AreEqual("Nier", game.name);
         }
 
-        [TestMethod]
+        //[TestMethod]
         public async Task FindLeastExpensiveGame_ShouldBeFuri()
         {
             ApiHelper api = ApiHelper.Instance;
             api.SetKey(API_KEY);
 
-            var data = await api.GetGamesForUser(TEST_ACC_URL, true);
+            var data = await api.GetGamesForUser(TEST_OLD_ACC_URL, true);
             SimpleGameModel game = DataAnalyzer.FindMostPlayedGame(data);
 
             Assert.AreEqual("Nier", game.name);
         }
+
+        //[TestMethod]
+        public async Task FindMostWorthGame_ShouldBeNier()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var data = await api.GetGamesForUser(TEST_OLD_ACC_URL, true);
+            var appids = data.Select(d => d.appid).ToList();
+            var detailedData = await api.GetDetailedGameInfos(appids);
+            var value = DataAnalyzer.FindMostWorthGame(data, detailedData);
+
+            Assert.AreEqual("Nier", value.detailedGame.name);
+            Assert.AreEqual(10, value.value);
+        }
+
+        //[TestMethod]
+        public async Task FindLeastWorthGame_ShouldBeFuri()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var data = await api.GetGamesForUser(TEST_OLD_ACC_URL, true);
+            var appids = data.Select(d => d.appid).ToList();
+            var detailedData = await api.GetDetailedGameInfos(appids);
+            var value = DataAnalyzer.FindMostWorthGame(data, detailedData);
+
+            Assert.AreEqual("Nier", value.detailedGame.name);
+            Assert.AreEqual(10, value.value);
+        }
+
+#endregion
 
 
         /*

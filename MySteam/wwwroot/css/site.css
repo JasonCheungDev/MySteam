@@ -1,7 +1,13 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
-    /* background-color: #171a21; */
+    background-color: #171a21; /* steam */
+    color: #b8b6b4; /* steam */
+    font-family: "Open Sans", Sans-serif;   /* "Motiva Sans, Sans-serif" - steam */
+}
+
+nav {
+    background-color: #171a21;  /* steam */
 }
 
 /* Wrapping element */
