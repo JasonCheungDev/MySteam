@@ -10,6 +10,20 @@ nav {
     background-color: #171a21;  /* steam */
 }
 
+/* steam */
+.steam-box {
+    background-color: #141414;
+    padding: 16px;
+}
+
+.avatar-img {
+    border: 2px solid grey;
+}
+/* PlayerController/Details */
+td {
+    padding: 8px;
+}
+
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {

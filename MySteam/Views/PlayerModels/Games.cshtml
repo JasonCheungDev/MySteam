@@ -43,10 +43,10 @@
                 @Html.DisplayFor(modelItem => item.playtime_forever)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.img_icon_url)
+                <img src=@Html.DisplayFor(modelItem => item.UsableImgIconUrl) />
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.img_logo_url)
+                <img src=@Html.DisplayFor(modelItem => item.UsableImgLogoUrl) />
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.has_community_visible_stats)

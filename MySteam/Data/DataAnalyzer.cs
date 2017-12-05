@@ -191,7 +191,7 @@ namespace MySteam.Data
 /// <summary>
 /// Simple struct that holds a SimpleGame object, DetailedGame object, and value (cost / time). 
 /// </summary>
-public struct GameValue
+public class GameValue
 {
     public SimpleGameModel simpleGame;
     public DetailedGameData detailedGame;

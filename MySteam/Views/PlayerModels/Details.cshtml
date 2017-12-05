@@ -10,7 +10,7 @@
     <h4>PlayerModel</h4>
     <hr />
 
-    <table>
+    <table class="steam-box">
         <tr>
             <td>
                 @Html.DisplayNameFor(model => model.personaname)
@@ -19,7 +19,7 @@
                 @Html.DisplayFor(model => model.personaname)
             </td>
             <td rowspan="5">
-                <img src=@Html.DisplayFor(model => model.avatarfull) />
+                <img src=@Html.DisplayFor(model => model.avatarfull) class="avatar-img"/>
             </td>
         </tr>
         <tr>

@@ -93,6 +93,70 @@ namespace MySteam.Controllers
             return View(games);
         }
 
+        // GET: PlayerModels/Create
+        public async Task<IActionResult> DetailedGames(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            GameViewModel info = new GameViewModel();
+
+            try
+            {
+                // Retrieve all raw data 
+                ApiHelper.Instance.SetKey(Constants.API_KEY);
+                var userGames = await ApiHelper.Instance.GetGamesForUser(id, true);
+                var ids = userGames.Select(sgm => sgm.appid).ToList();
+                var detailedGames = await _context.GetDetailedGameDatas(ids);
+
+                // Compile into something easier to work with
+                var overview = userGames.ToDictionary(
+                    sgm => sgm.appid, 
+                    sgm => new GameValue() { simpleGame = sgm }
+                );
+                foreach (DetailedGameData dgd in detailedGames)
+                    overview[dgd.steam_appid].detailedGame = dgd;
+
+                // Calculate necessary values
+                var count = userGames.Count;
+                var totalTime = DataAnalyzer.CalculateTotalTimePlayed(userGames);
+                var totalWorth = DataAnalyzer.CalculateTotalGameWorth(detailedGames);
+                var mostExpensive = DataAnalyzer.FindMostExpensiveGame(detailedGames);
+                var leastExpensive = DataAnalyzer.FindLeastExpensiveGame(detailedGames);
+                var mostWorth = DataAnalyzer.FindMostWorthGame(userGames, detailedGames);
+                var leastWorth = DataAnalyzer.FindMostWorthGame(userGames, detailedGames);
+
+                // Construct view model
+                info.RequestId = System.Diagnostics.Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                info.GameCount = count;
+                info.TotalTimePlayed = totalTime + " minutes";
+                info.TotalWorth = "$" + totalWorth;
+                info.MostExpensiveGame = overview[mostExpensive.steam_appid];
+                info.LeastExpensiveGame = overview[leastExpensive.steam_appid];
+                info.MostWorthGame = mostWorth;
+                info.LeastWorthGame = leastWorth;
+                info.Games = overview.Select(o => o.Value).ToList();
+            }
+            catch (MissingSteamIDException ex)
+            {
+                return NotFound();
+            }
+            catch (InvalidSteamIDException ex)
+            {
+                return NotFound();
+            }
+
+            if (info == null)
+            {
+                return NotFound();
+            }
+
+            return View(info);
+        }
+       
+
         // POST: PlayerModels/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.

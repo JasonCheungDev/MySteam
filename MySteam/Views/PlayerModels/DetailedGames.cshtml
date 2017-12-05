@@ -1,0 +1,106 @@
+﻿
+@model MySteam.Models.GameViewModel
+@{
+    ViewData["Title"] = "DetailedGames";
+}
+
+<h2>DetailedGames</h2>
+<div>
+    <h4>Game Info</h4>
+    <hr />
+    <div class="steam-box">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.GameCount)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.GameCount)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.TotalTimePlayed)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.TotalTimePlayed)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.TotalTimePlayed)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.TotalTimePlayed)
+            </dd>
+        </dl>
+    </div>
+
+    <div class="steam-box">
+        <table>
+            <tr>
+                <td>
+                    @Html.DisplayNameFor(model => model.MostExpensiveGame)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.MostExpensiveGame.detailedGame.name)
+                    @Html.DisplayFor(model => model.MostExpensiveGame.detailedGame.price_overview.final)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.DisplayNameFor(model => model.LeastExpensiveGame)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.LeastExpensiveGame.detailedGame.name)
+                    @Html.DisplayFor(model => model.LeastExpensiveGame.detailedGame.price_overview.final)                
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="steam-box">
+        <table>
+            <tr>
+                <td>
+                    @Html.DisplayNameFor(model => model.MostWorthGame)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.MostWorthGame.detailedGame.name)
+                    @Html.DisplayFor(model => model.MostWorthGame.value)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.DisplayNameFor(model => model.LeastWorthGame)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => model.LeastWorthGame.detailedGame.name)
+                    @Html.DisplayFor(model => model.LeastWorthGame.value)
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <table>
+        @foreach (var item in Model.Games)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.simpleGame.name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.simpleGame.playtime_forever)
+                </td>
+                <td>
+                    <img src=@Html.DisplayFor(modelItem => item.simpleGame.UsableImgIconUrl) />
+                </td>
+                <td>
+                    <img src=@Html.DisplayFor(modelItem => item.simpleGame.UsableImgLogoUrl) />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.detailedGame.price_overview.final)
+                </td>
+            </tr>
+        }
+    </table>
+
+</div>
+<div>
+    <a asp-action="Index">Select another user</a>
+</div>

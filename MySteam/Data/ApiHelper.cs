@@ -170,12 +170,6 @@ namespace MySteam.Data
             {
                 var result = await response.Content.ReadAsAsync<SimpleGameResult>();
                 games = result.response.games;
-                // var jsonString = await response.Content.ReadAsStringAsync();
-                // Json.Decode(jsonString);
-                // var jj = JObject.Parse(jsonString);
-                // var models = JsonConvert.DeserializeObject<List<SteamModel>>(jsonString);
-                // user = models[0];
-                // user = await response.Content.ReadAsAsync<SteamModel>();
             }
 
             return games;
@@ -201,6 +195,8 @@ namespace MySteam.Data
                     }
                     else
                     {
+                        // Failed for whatever reason. 
+                        // Warning: User can own a closed/non-existing game, which leads to descrepency between owned games and detailed games. (success == false)
                         Console.WriteLine("GetDetailedGameInfo - pulling data for " + appid + " failed.");
                     }
                 }

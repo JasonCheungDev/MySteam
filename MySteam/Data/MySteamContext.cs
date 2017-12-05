@@ -78,7 +78,7 @@ namespace MySteam.Models
                 }
                 else
                 {
-                    Console.WriteLine("GetDetailedGameDatas - Did not find " + appid + " in DB. Pulling from API.");
+                    Console.WriteLine("GetDetailedGameDatas - Did not find " + appid + " in DB. Will pull from API.");
                     missingGames.Add(appid);    // add appid to retrieve from API
                 }
             }
@@ -86,16 +86,19 @@ namespace MySteam.Models
             // 2. Check API for missing 
             if (missingGames.Count > 0)
             {
+                Console.WriteLine("GetDetailedGameDatas - Pulling " + missingGames.Count + " games from API.");
                 List<DetailedGameData> retrievedGames = await ApiHelper.Instance.GetDetailedGameInfos(missingGames);
                 games.AddRange(retrievedGames);
 
                 // 3. Add to DB
+                Console.WriteLine("GetDetailedGameDatas - Saving " + games.Count + " games retrieved from API.");
                 var serialized = retrievedGames.Select(dgd => new DetailedGameModelDatabase()
                 {
                     appid = dgd.steam_appid,
                     DetailedGameModelDataString = JsonConvert.SerializeObject(dgd)
                 }).ToList();
                 DetailedGame.AddRange(serialized);  // TODO: good chance this will crash  - no existing checking
+                SaveChanges();
             }
 
 

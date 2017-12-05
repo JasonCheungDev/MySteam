@@ -46,5 +46,19 @@ namespace MySteam.Tests
             // Console should print first from API, second from DB
         }
 
+        [TestMethod]
+        public async Task TestBatchCall()
+        {
+            ApiHelper api = ApiHelper.Instance;
+            api.SetKey(API_KEY);
+
+            var simpleGames = await ApiHelper.Instance.GetGamesForUser(TEST_OLD_ACC_URL);
+            var ids = simpleGames.Select(sgm => sgm.appid).ToList();
+            var detailedGames = await mContext.GetDetailedGameDatas(ids);
+
+            Assert.AreEqual(16, detailedGames.Count);
+            Assert.AreEqual(16, mContext.DetailedGame.Count());
+        }
+
     }
 }
